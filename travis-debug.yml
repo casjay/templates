@@ -1,0 +1,22 @@
+# For more information about the configurations used
+# in this file, please see the Travis CI documentation.
+# .travis.yml
+# https://docs.travis-ci.com
+
+os: linux
+dist: bionic
+sudo: enabled
+language: bash
+
+install:
+  - sudo bash -c "$(curl -LSs https://raw.githubusercontent.com/casjay/templates/master/travis-ci.sh)"
+  - bash -c "$(curl -LSs https://github.com/casjay-dotfiles/scripts/raw/master/install.sh)"
+
+script:
+  - bash -c ./install.sh
+  - bash -c 'shopt -s globstar nullglob; shellcheck **/*.{sh,ksh,bash}'
+
+notifications:
+  email:
+    on_failure: never
+    on_success: never

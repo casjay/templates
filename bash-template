@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+SCRIPTNAME="$(basename $0)"
+SCRIPTDIR="$(dirname "${BASH_SOURCE[0]}")"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# @Author      : Jason
+# @Contact     : casjaysdev@casjay.net
+# @File        : 
+# @Created     : Tue, Dec 31, 2019, 00:00 EST
+# @License     : WTFPL
+# @Copyright   : Copyright (c) CasjaysDev
+# @Description : 
+#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Set functions
+
+if [ -f /usr/local/share/CasjaysDev/scripts/functions/main.bash ]; then
+	. /usr/local/share/CasjaysDev/scripts/functions/main.bash
+elif [ -f "$HOME/.local/share/scripts/functions/main.bash" ]; then
+	. "$HOME/.local/share/scripts/functions/main.bash"
+else
+	mkdir -p "$HOME/.local/share/scripts/functions"
+	curl -LSs https://github.com/casjay-dotfiles/scripts/raw/master/functions/app-installer.bash -o "$HOME/.local/share/scripts/functions/main.bash"
+	. "$HOME/.local/share/scripts/functions/main.bash"
+fi
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Set options
+
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# main program
+
+
+# exit
+if [ ! -z "$EXIT"  ]; then exit "$EXIT" ; fi
+
+
+# end
+#/* vim set expandtab ts=4 noai

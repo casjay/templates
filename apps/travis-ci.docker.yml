@@ -1,0 +1,26 @@
+# For more information about the configurations used
+# in this file, please see the Travis CI documentation.
+# .travis.yml
+# https://docs.travis-ci.com
+language: shell
+sudo: enabled
+
+install:
+  - sudo bash -c "$(curl -LSs https://github.com/casjay-dotfiles/scripts/raw/master/install.sh)"
+  - pkmgr init
+  - pkmgr update
+  - bash -c "$(curl -LSs https://github.com/casjay-dotfiles/zsh/raw/master/install.sh)"
+  - ./install.sh
+
+matrix:
+  include:
+   - name: "Ubuntu 18.04"
+     os: linux
+     dist: bionic
+     group: travis_latest
+     env: DOCKER="ubuntu:eoan" VARIANT="ubuntu"
+
+notifications:
+  email:
+    on_failure: never
+    on_success: never

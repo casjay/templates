@@ -1,0 +1,20 @@
+# For more information about the configurations used
+# in this file, please see the Travis CI documentation.
+# .travis.yml
+# https://docs.travis-ci.com
+os: linux
+dist: bionic
+language: bash
+sudo: enabled
+
+before_install:
+  - sudo bash -c "$(curl -LSs https://github.com/casjay/templates/raw/master/travis-ci.init.sh)"
+
+install:
+  - sudo bash -c "$(curl -LSs https://github.com/casjay-dotfiles/CHANGEME/raw/master/install.sh)"
+  - bash -c "$(curl -LSs https://github.com/casjay-dotfiles/CHANGEME/raw/master/install.sh)"
+
+notifications:
+  email:
+    on_failure: never
+    on_success: never
