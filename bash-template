@@ -1,40 +1,60 @@
 #!/usr/bin/env bash
-SCRIPTNAME="$(basename $0)"
-SCRIPTDIR="$(dirname "${BASH_SOURCE[0]}")"
+
+APPNAME="$(basename $0)"
+USER="${SUDO_USER:-${USER}}"
+HOME="${USER_HOME:-${HOME}}"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# @Author      : Jason
-# @Contact     : casjaysdev@casjay.net
-# @File        : 
-# @Created     : Tue, Dec 31, 2019, 00:00 EST
-# @License     : WTFPL
-# @Copyright   : Copyright (c) CasjaysDev
-# @Description : 
+# @Author          : Jason
+# @Contact         : casjaysdev@casjay.net
+# @File            : install.sh
+# @Created         : Wed, Aug 09, 2020, 02:00 EST
+# @License         : WTFPL
+# @Copyright       : Copyright (c) CasjaysDev
+# @Description     : installer script for template
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Set functions
+# Source the functions
 
-if [ -f /usr/local/share/CasjaysDev/scripts/functions/main.bash ]; then
-	. /usr/local/share/CasjaysDev/scripts/functions/main.bash
-elif [ -f "$HOME/.local/share/scripts/functions/main.bash" ]; then
-	. "$HOME/.local/share/scripts/functions/main.bash"
+SCRIPTSFUNCTURL="${SCRIPTSAPPFUNCTURL:-https://github.com/casjay-dotfiles/scripts/raw/master/functions}"
+SCRIPTSFUNCTDIR="${SCRIPTSAPPFUNCTDIR:-/usr/local/share/CasjaysDev/scripts}"
+SCRIPTSFUNCTFILE="${SCRIPTSAPPFUNCTFILE:-app-installer.bash}"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+if [ -f "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE" ]; then
+    . "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE"
+elif [ -f "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE" ]; then
+    . "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE"
 else
-	mkdir -p "$HOME/.local/share/scripts/functions"
-	curl -LSs https://github.com/casjay-dotfiles/scripts/raw/master/functions/app-installer.bash -o "$HOME/.local/share/scripts/functions/main.bash"
-	. "$HOME/.local/share/scripts/functions/main.bash"
+    curl -LSs "$SCRIPTSFUNCTURL/$SCRIPTSFUNCTFILE" -o "/tmp/$SCRIPTSFUNCTFILE" || exit 1
+    . "/tmp/$SCRIPTSFUNCTFILE"
 fi
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Setup the help function
+
+
+__help() {
+
+}
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Set options
 
-
+[ "$1" = "--help" ] && __help && exit
+[ "$1" = "--version" ] && get_app_info "$APPNAME"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # main program
 
+echo template
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # exit
 if [ ! -z "$EXIT"  ]; then exit "$EXIT" ; fi
