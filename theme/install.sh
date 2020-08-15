@@ -1,107 +1,190 @@
 #!/usr/bin/env bash
 
-APPNAME="ThemeName"
-SCRIPTNAME="$(basename $0)"
-SCRIPTDIR="$(dirname "${BASH_SOURCE[0]}")"
+APPNAME="$(basename $0)"
+USER="${SUDO_USER:-${USER}}"
+HOME="${USER_HOME:-${HOME}}"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# @Author      : Jason
-# @Contact     : casjaysdev@casjay.net
-# @File        : install
-# @Created     : Mon, Dec 31, 2019, 00:00 EST
-# @License     : WTFPL
-# @Copyright   : Copyright (c) CasjaysDev
-# @Description : installer script for ThemeName
+# @Author          : Jason
+# @Contact         : casjaysdev@casjay.net
+# @File            : install.sh
+# @Created         : Wed, Aug 09, 2020, 02:00 EST
+# @License         : WTFPL
+# @Copyright       : Copyright (c) CasjaysDev
+# @Description     : installer script for template
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Set functions
 
-if [ -f /usr/local/share/CasjaysDev/scripts/functions/app-installer.bash ]; then
-    . /usr/local/share/CasjaysDev/scripts/functions/app-installer.bash
-elif [ -f "$HOME/.local/share/scripts/functions/app-installer.bash" ]; then
-    . "$HOME/.local/share/scripts/functions/app-installer.bash"
+SCRIPTSFUNCTURL="${SCRIPTSAPPFUNCTURL:-https://github.com/casjay-dotfiles/scripts/raw/master/functions}"
+SCRIPTSFUNCTDIR="${SCRIPTSAPPFUNCTDIR:-/usr/local/share/CasjaysDev/scripts}"
+SCRIPTSFUNCTFILE="${SCRIPTSAPPFUNCTFILE:-app-installer.bash}"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+if [ -f "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE" ]; then
+  . "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE"
+elif [ -f "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE" ]; then
+  . "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE"
 else
-    mkdir -p "$HOME/.local/share/scripts/functions"
-    curl -LSs https://github.com/casjay-dotfiles/scripts/raw/master/functions/app-installer.bash -o "$HOME/.local/share/scripts/functions/app-installer.bash"
-    . "$HOME/.local/share/scripts/functions/app-installer.bash"
+  curl -LSs "$SCRIPTSFUNCTURL/$SCRIPTSFUNCTFILE" -o "/tmp/$SCRIPTSFUNCTFILE" || exit 1
+  . "/tmp/$SCRIPTSFUNCTFILE"
 fi
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Make sure the scripts repo is installed
+
+scripts_check
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Defaults
 
-CONF="/usr/local/etc/CasjaysDev"
-THEMEDIR="/usr/local/share/themes"
-HOMEDIR="/usr/local/share/CasjaysDev/thememgr"
-APPDIR="/usr/local/share/CasjaysDev/thememgr/$APPNAME"
-REPO="${THEMEMGRREPO:-https://github.com/thememgr}"
-
-# Version
-APPVERSION="$(curl -LSs $REPO/$APPNAME/raw/master/version.txt)"
+APPNAME="template"
+PLUGNAME=""
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Requires root
+# git repos
 
-sudoreq  # sudo required
+PLUGINREPO=""
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Version
+
+APPVERSION="$(curl -LSs ${THEMEMGRREPO:-https://github.com/thememgr}/$APPNAME/raw/master/version.txt)"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# installer type
+
+theme_installer
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Set options
+
+APPDIR="$CONF/CasjaysDev/thememgr"
+PLUGDIR="$SHARE/$APPNAME/${PLUGNAME:-plugins}"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Script options IE: --help
+
+show_optvars "$@"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Requires root - no point in continuing
+
+#sudoreq  # sudo required
 #sudorun  # sudo optional
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# end with a space
+
+APP=""
+PERL=""
+PYTH=""
+PIPS=""
+CPAN=""
+GEMS=""
+
+# install packages - useful for package that have the same name on all oses
+install_packages $APP
+
+# install required packages using file
+install_required $APP
+
+# check for perl modules and install using system package manager
+install_perl $PERL
+
+# check for python modules and install using system package manager
+install_python $PYTH
+
+# check for pip binaries and install using python package manager
+install_pip $PIPS
+
+# check for cpan binaries and install using perl package manager
+install_cpan $CPAN
+
+# check for ruby binaries and install using ruby package manager
+install_gem $GEMS
+
+# Other dependencies
+dotfilesreq
+dotfilesreqadmin
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Ensure directories exist
 
-mkd "$HOMEDIR"
-mkd "$THEMEDIR"
-mkd "$CONF/CasjaysDev/thememgr"
+ensure_dirs
+ensure_perms
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Main progam
 
 if [ -d "$APPDIR/.git" ]; then
-    execute \
-          "cd $APPDIR && \
-           git_update" \
-          "Updating $APPNAME theme"
+  execute \
+    "git_update $APPDIR" \
+    "Updating $APPNAME configurations"
 else
-    if [ -d "$BACKUPDIR/$APPNAME" ]; then
-        rm_rf "$BACKUPDIR"/"$APPNAME"
-    fi
-    execute \
-          "mv_f $APPDIR $BACKUPDIR/$APPNAME && \
-           git_clone -q $REPO/$APPNAME $APPDIR" \
-          "Installing $APPNAME theme"
+  execute \
+    "backupapp && \
+    git_clone -q $REPO/$APPNAME $APPDIR" \
+    "Installing $APPNAME configurations"
 fi
+
+# exit on fail
+failexitcode
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Plugins
+
+if [ "$PLUGNAME" != "" ]; then
+  if [ -d "$PLUGDIR"/.git ]; then
+    execute \
+      "git_update $PLUGDIR" \
+      "Updating $PLUGNAME"
+  else
+    execute \
+      "git_clone $PLUGINREPO $PLUGDIR" \
+      "Installing $PLUGNAME"
+  fi
+fi
+
+# exit on fail
+failexitcode
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # run post install scripts
 
 run_postinst() {
-    ln_sf "$HOMEDIR/$APPNAME" "$THEMEDIR/$APPNAME"
-    if [ -f "$THEMEDIR/$APPNAME/index.theme" ]; then
-      devnull gtk-update-theme-cache -f -q "$THEMEDIR/$APPNAME/"
-      devnull fc-cache -fv
-    fi
+  run_postinst_global
+  run_post_theme
 }
 
-     execute \
-          "run_postinst" \
-          "Running post install scripts"
+execute \
+  "run_postinst" \
+  "Running post install scripts"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # create version file
 
-if [ ! -f "$CONF/CasjaysDev/thememgr/$APPNAME" ] && [ -f "$APPDIR/version.txt" ]; then
-    ln_sf "$APPDIR/version.txt" "$CONF/CasjaysDev/thememgr/$APPNAME"
-fi
+install_thememgr_version
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # exit
-if [ ! -z "$EXIT" ]; then exit "$EXIT"; fi
+run_exit
 
 # end
-#/* vi: set expandtab ts=4 noai
