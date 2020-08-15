@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-SCRIPTNAME="$(basename $0)"
-SCRIPTDIR="$(dirname "${BASH_SOURCE[0]}")"
+APPNAME="$(basename $0)"
 USER="${SUDO_USER:-${USER}}"
+HOME="${USER_HOME:-${HOME}}"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # @Author          : Jason
 # @Contact         : casjaysdev@casjay.net
 # @File            : install.sh
-# @Created         : Sun, Feb 23, 2020, 01:00 EST
+# @Created         : Wed, Aug 15, 2020, 13:52 EST
 # @License         : WTFPL
 # @Copyright       : Copyright (c) CasjaysDev
 # @Description     : installer script for template
@@ -17,22 +17,19 @@ USER="${SUDO_USER:-${USER}}"
 
 # Set functions
 
-SCRIPTSFUNCTURL="${SCRIPTSFUNCTURL:-https://github.com/casjay-dotfiles/scripts/raw/master/functions}"
-SCRIPTSFUNCTDIR="${SCRIPTSFUNCTDIR:-/usr/local/share/CasjaysDev/scripts}"
-SCRIPTSFUNCTFILE="${SCRIPTSFUNCTFILE:-app-installer.bash}"
+SCRIPTSFUNCTURL="${SCRIPTSAPPFUNCTURL:-https://github.com/casjay-dotfiles/scripts/raw/master/functions}"
+SCRIPTSFUNCTDIR="${SCRIPTSAPPFUNCTDIR:-/usr/local/share/CasjaysDev/scripts}"
+SCRIPTSFUNCTFILE="${SCRIPTSAPPFUNCTFILE:-app-installer.bash}"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if [ -f "../functions/$SCRIPTSFUNCTFILE" ]; then
-    . "../functions/$SCRIPTSFUNCTFILE"
-elif [ -f "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE" ]; then
+if [ -f "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE" ]; then
     . "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE"
+elif [ -f "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE" ]; then
+    . "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE"
 else
-    if [ ! -f "$HOME/.local/tmp/$SCRIPTSFUNCTFILE" ]; then
-      mkdir -p "$HOME/.local/tmp"
-      curl -LSs "$SCRIPTSFUNCTURL/$SCRIPTSFUNCTFILE" -o "$HOME/.local/tmp/$SCRIPTSFUNCTFILE"
-    fi
-    . "$HOME/.local/tmp/$SCRIPTSFUNCTFILE"
+    curl -LSs "$SCRIPTSFUNCTURL/$SCRIPTSFUNCTFILE" -o "/tmp/$SCRIPTSFUNCTFILE" || exit 1
+    . "/tmp/$SCRIPTSFUNCTFILE"
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -62,7 +59,7 @@ APPVERSION="$(curl -LSs ${DOTFILESREPO:-https://github.com/casjay-dotfiles}/$APP
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# if installing system wide - change to system_installdirs
+# options are: user_installdirs system_installdirs pkmgr_installer iconmgr_installer font_installer theme_installer
 
 user_installdirs
 
@@ -153,13 +150,13 @@ failexitcode
 
 if [ "$PLUGNAME" != "" ]; then
     if [ -d "$PLUGDIR"/.git ]; then
-      execute \
-         "git_update $PLUGDIR" \
-         "Updating $PLUGNAME"
+        execute \
+            "git_update $PLUGDIR" \
+            "Updating plugin $PLUGNAME"
     else
-      execute \
-         "git_clone $PLUGINREPO $PLUGDIR" \
-         "Installing $PLUGNAME"
+        execute \
+            "git_clone $PLUGINREPO $PLUGDIR" \
+            "Installing plugin $PLUGNAME"
     fi
 fi
 
@@ -172,12 +169,12 @@ failexitcode
 
 run_postinst() {
     run_postinst_global
-
+    
 }
 
-   execute \
-       "run_postinst" \
-       "Running post install scripts"
+execute \
+    "run_postinst" \
+    "Running post install scripts"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -190,7 +187,4 @@ install_version
 # exit
 run_exit
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 # end
-# vim: ts=2 sw=2 et noai :
