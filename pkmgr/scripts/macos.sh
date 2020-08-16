@@ -36,15 +36,21 @@ fi
 
 run_post() { local e="$1" ; local m="$(echo $1 | sed 's#devnull ##g')" ; execute "$e" "executing: $m" ; setexitstatus ; set -- ;}
 system_service_exists() { if systemctl list-units --full -all | grep -Fq "$1" ; then return 0 ; else return 1 ; fi ; setexitstatus ; set -- ;}
-system_service_enable() { if system_service_exists ; then execute "systemctl enable -f $1" "Enabling service: $1" ; fi ; setexitstatus ; set -- ;}
-system_service_disable() { if system_service_exists ; then execute "systemctl disable --now $@" "Disabling service: $@" ; fi ; setexitstatus ; set --;}
+system_service_enable() { if system_service_exists "$1" ; then execute "systemctl enable --now -f $1" "Enabling service: $1" ; fi ; setexitstatus ; set -- ;}
+system_service_disable() { if system_service_exists "$1" ; then execute "systemctl disable --now $1" "Disabling service: $1" ; fi ; setexitstatus ; set --;}
 
+detect_selinux() { selinuxenabled; if [ $? -ne 0 ]; then return 0; else return 1 ; fi ;}
+disable_selinux() { selinuxenabled; devnull setenforce 0 ;}
+
+grab_remote_file() { urlverify "$1" && curl -sSLq "$@" || exit 1 ;}
+run_external() { printf_green "Executing $*" && "$@" >/dev/null 2>&1 ;}
+
+retrieve_version_file() { grab_remote_file https://github.com/casjay-base/centos/raw/master/version.txt | head -n1 || echo "Unknown version" ;}
+
+#### OS Specific
 test_pkg() { devnull brew list $1 && printf_success "$1 is installed" && return 1 || return 0 ; setexitstatus ; set -- ;}
 remove_pkg() { if ! test_pkg "$1" ; then execute "brew remove -f $1" "Removing: $1" ; fi ; setexitstatus ; set -- ;}
 install_pkg() { if test_pkg "$1" ; then execute "brew install -f $1" "Installing: $1" ; fi ; setexitstatus ; set --  ;}
-
-detect_selinux() { selinuxenabled; if [ $? -ne 0 ]; then return 0; else return 1 ; fi ;}
-disable_selinux() { selinuxenabled; setenforce 0 ;}
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -105,10 +111,6 @@ system_service_enable avahi-daemon.service
 system_service_enable tlp.service
 system_service_enable org.cups.cupsd.service
 system_service_disable mpd
-
-run_post "devnull systemctl set-default multi-user.target"
-
-run_post "devnull grub-mkconfig -o /boot/grub/grub.cfg"
 
 ##################################################################################################################
 printf_head "Cleaning up"
