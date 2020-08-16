@@ -62,10 +62,10 @@ execute "sudo PKMGR"
 printf_head "Configuring cores for compiling"
 ##################################################################################################################
 
-if [ -f /etc/makepkg.conf ]; then
 numberofcores=$(grep -c ^processor /proc/cpuinfo)
 printf_info "Total cores avaliable: $numberofcores"
 
+if [ -f /etc/makepkg.conf ]; then
 if [ $numberofcores -gt 1 ]; then
   sed -i 's/#MAKEFLAGS="-j2"/MAKEFLAGS="-j'$(($numberofcores+1))'"/g' /etc/makepkg.conf;
   sed -i 's/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T '"$numberofcores"' -z -)/g' /etc/makepkg.conf
