@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-SCRIPTNAME="$(basename $0)"
-SCRIPTDIR="$(dirname "${BASH_SOURCE[0]}")"
+APPNAME="$(basename $0)"
+USER="${SUDO_USER:-${USER}}"
+HOME="${USER_HOME:-${HOME}}"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # @Author      : Jason
@@ -34,16 +35,16 @@ fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 run_post() { local e="$1" ; local m="$(echo $1 | sed 's#devnull ##g')" ; execute "$e" "executing: $m" ; setexitstatus ; set -- ;}
-system_service_exists() { if sudo systemctl list-units --full -all | grep -Fq "$1" ; then return 0 ; else return 1 ; fi ; setexitstatus ; set -- ;}
-system_service_enable() { if system_service_exists ; then execute "sudo systemctl enable -f $1" "Enabling service: $1" ; fi ; setexitstatus ; set -- ;}
-system_service_disable() { if system_service_exists ; then execute "sudo systemctl disable --now $@" "Disabling service: $@" ; fi ; setexitstatus ; set --;}
+system_service_exists() { if systemctl list-units --full -all | grep -Fq "$1" ; then return 0 ; else return 1 ; fi ; setexitstatus ; set -- ;}
+system_service_enable() { if system_service_exists ; then execute "systemctl enable -f $1" "Enabling service: $1" ; fi ; setexitstatus ; set -- ;}
+system_service_disable() { if system_service_exists ; then execute "systemctl disable --now $@" "Disabling service: $@" ; fi ; setexitstatus ; set --;}
 
-test_pkg() { devnull sudo pacman -Qi "$1" && printf_success "$1 is installed" && return 1 || return 0 ; setexitstatus ; set -- ;}
-remove_pkg() { if ! test_pkg "$1" ; then execute "sudo pacman -R  --noconfirm $1" "Removing: $1" ; fi ; setexitstatus ; set -- ;}
-install_pkg() { if test_pkg "$1" ; then execute "sudo pacman -S --noconfirm --needed $1" "Installing: $1" ; fi ; setexitstatus ; set --  ;}
+test_pkg() { devnull rpm -q $pkg $1 && printf_success "$1 is installed" && return 1 || return 0 ; setexitstatus ; set -- ;}
+remove_pkg() { if ! test_pkg "$1" ; then execute "yum remove -q -y $1" "Removing: $1" ; fi ; setexitstatus ; set -- ;}
+install_pkg() { if test_pkg "$1" ; then execute "yum remove -q -y install $1" "Installing: $1" ; fi ; setexitstatus ; set --  ;}
 
 detect_selinux() { selinuxenabled; if [ $? -ne 0 ]; then return 0; else return 1 ; fi ;}
-disable_selinux() { selinuxenabled; sudo setenforce 0 ;}
+disable_selinux() { selinuxenabled; setenforce 0 ;}
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -55,62 +56,40 @@ disable_selinux() { selinuxenabled; sudo setenforce 0 ;}
 printf_head "Initializing the setup script"
 ##################################################################################################################
 
-sudoask && sudoexit
 execute "sudo PKMGR"
 
 ##################################################################################################################
 printf_head "Configuring cores for compiling"
 ##################################################################################################################
 
+if [ -f /etc/makepkg.conf ]; then
 numberofcores=$(grep -c ^processor /proc/cpuinfo)
 printf_info "Total cores avaliable: $numberofcores"
 
 if [ $numberofcores -gt 1 ]; then
-  sudo sed -i 's/#MAKEFLAGS="-j2"/MAKEFLAGS="-j'$(($numberofcores+1))'"/g' /etc/makepkg.conf;
-  sudo sed -i 's/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T '"$numberofcores"' -z -)/g' /etc/makepkg.conf
+  sed -i 's/#MAKEFLAGS="-j2"/MAKEFLAGS="-j'$(($numberofcores+1))'"/g' /etc/makepkg.conf;
+  sed -i 's/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T '"$numberofcores"' -z -)/g' /etc/makepkg.conf
+fi
 fi
 
 ##################################################################################################################
-printf_head "Installing the TEMPLATE packages"
+printf_head "Installing the packages for TEMPLATE"
 ##################################################################################################################
 
-install_pkg qtile 
-
-##################################################################################################################
-printf_head "Installing the packages fram AUR"
-##################################################################################################################
-
-
-install_aur ttf-font-awesome
-install_aur brackets-bin
-install_aur cmatrix-git
-install_aur font-manager-git
-install_aur hardcode-fixer-git
-install_aur pamac-aur
-install_aur visual-studio-code
-install_aur menulibre
-install_aur mugshot
-install_aur xfce4-panel-profiles
+install_pkg listofpkgs 
 
 ##################################################################################################################
 printf_head "Fixing packages"
 ##################################################################################################################
 
-run_post "sudo sed -i 's/'#AutoEnable=false'/'AutoEnable=true'/g' /etc/bluetooth/main.conf"
-run_post "sudo sed -i 's/files mymachines myhostname/files mymachines/g' /etc/nsswitch.conf"
-run_post "sudo sed -i 's/\[\!UNAVAIL=return\] dns/\[\!UNAVAIL=return\] mdns dns wins myhostname/g' /etc/nsswitch.conf"
-run_post "sudo usermod  -a -G rfkill $USER"
 
 ##################################################################################################################
 printf_head "setting up config files"
 ##################################################################################################################
 
 run_post "cp -rT /etc/skel $HOME"
-run_post "dotfilesreq APPWM"
 run_post "dotfilesreq bash"
-run_post "dotfilesreq geany"
 run_post "dotfilesreq misc"
-run_post "dotfilesreq xfce4"
 
 run_post dotfilesreqadmin samba
 
@@ -127,9 +106,9 @@ system_service_enable tlp.service
 system_service_enable org.cups.cupsd.service
 system_service_disable mpd
 
-run_post "devnull sudo systemctl set-default graphical.target"
+run_post "devnull systemctl set-default multi-user.target"
 
-run_post "devnull sudo grub-mkconfig -o /boot/grub/grub.cfg"
+run_post "devnull grub-mkconfig -o /boot/grub/grub.cfg"
 
 ##################################################################################################################
 printf_head "Cleaning up"
