@@ -33,10 +33,20 @@ fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 run_post() { local e="$1" ; local m="$(echo $1 | sed 's#devnull ##g')" ; execute "$e" "executing: $m" ; setexitstatus ; set -- ;}
-system_service_exists() { if sudo systemctl list-units --full -all | grep -Fq "$1" ; then return 0 ; else return 1 ; fi ; setexitstatus ; set -- ;}
-system_service_enable() { if system_service_exists ; then execute "sudo systemctl enable -f $1" "Enabling service: $1" ; fi ; setexitstatus ; set -- ;}
-system_service_disable() { if system_service_exists ; then execute "sudo systemctl disable --now $@" "Disabling service: $@" ; fi ; setexitstatus ; set --;}
+system_service_exists() { if systemctl list-units --full -all | grep -Fq "$1" ; then return 0 ; else return 1 ; fi ; setexitstatus ; set -- ;}
+system_service_enable() { if system_service_exists "$1" ; then execute "systemctl enable --now -f $1" "Enabling service: $1" ; fi ; setexitstatus ; set -- ;}
+system_service_disable() { if system_service_exists "$1" ; then execute "systemctl disable --now $1" "Disabling service: $1" ; fi ; setexitstatus ; set --;}
 
+detect_selinux() { selinuxenabled; if [ $? -ne 0 ]; then return 0; else return 1 ; fi ;}
+disable_selinux() { selinuxenabled; devnull setenforce 0 ;}
+
+grab_remote_file() { urlverify "$1" && curl -sSLq "$@" || exit 1 ;}
+run_external() { printf_green "Executing $*" && "$@" >/dev/null 2>&1 ;}
+
+retrieve_version_file() { grab_remote_file https://github.com/casjay-base/centos/raw/master/version.txt | head -n1 || echo "Unknown version" ;}
+run_grub() { printf_green "Setting up grub"; rm -Rf /boot/*rescue* ; devnull grub2-mkconfig -o /boot/grub2/grub.cfg ;}
+
+#### OS Specific
 test_pkg() { devnull sudo xbps-query -l $1 && printf_success "$1 is installed" && return 1 || return 0 ; setexitstatus ; set -- ;}
 remove_pkg() { if ! test_pkg "$1" ; then execute "sudo xbps-remove -R $1" "Removing: $1" ; fi ; setexitstatus ; set -- ;}
 install_pkg() { if test_pkg "$1" ; then execute "sudo xbps-install -Su $1" "Installing: $1" ; fi ; setexitstatus ; set --  ;}
