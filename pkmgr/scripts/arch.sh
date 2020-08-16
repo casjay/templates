@@ -6,12 +6,12 @@ SCRIPTDIR="$(dirname "${BASH_SOURCE[0]}")"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # @Author      : Jason
 # @Contact     : casjaysdev@casjay.net
-# @File        : APPWM.sh
-# @Created     : Mon, Dec 31, 2019, 00:00 EST
+# @File        : template.sh
+# @Created     : Sat, Aug 15, 2020, 22:31 EST
 # @License     : WTFPL
 # @Copyright   : Copyright (c) CasjaysDev
-# @Description : APPWM installer for archlinux
-# @Resource    : https://github.com/arcolinuxd/arco-APPWM
+# @Description : Template installer for OS
+# @Resource    : 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Set functions
@@ -54,7 +54,7 @@ printf_head "Initializing the setup script"
 ##################################################################################################################
 
 sudoask && sudoexit
-execute "sudo pacman -Syyu --noconfirm" "Updating System"
+execute "sudo PKMGR"
 
 ##################################################################################################################
 printf_head "Configuring cores for compiling"
@@ -69,193 +69,15 @@ if [ $numberofcores -gt 1 ]; then
 fi
 
 ##################################################################################################################
-printf_head "Installing the qtile desktop"
+printf_head "Installing the TEMPLATE packages"
 ##################################################################################################################
 
 install_pkg qtile 
 
-install_pkg arcolinux-xfce-git
-install_pkg arcolinux-qtile-git
-install_pkg arcolinux-config-qtile-git
-install_pkg arcolinux-qtile-dconf-git
-
 ##################################################################################################################
-printf_head "Installing desktop packages"
+printf_head "Installing the packages fram AUR"
 ##################################################################################################################
 
-install_pkg lightdm
-install_pkg arcolinux-lightdm-gtk-greeter
-install_pkg arcolinux-lightdm-gtk-greeter-settings
-install_pkg arcolinux-wallpapers-git
-install_pkg pulseaudio
-install_pkg pulseaudio-alsa
-install_pkg pavucontrol
-install_pkg alsa-utils
-install_pkg alsa-plugins
-install_pkg alsa-lib
-install_pkg alsa-firmware
-install_pkg gstreamer
-install_pkg gst-plugins-good
-install_pkg gst-plugins-bad
-install_pkg gst-plugins-base
-install_pkg gst-plugins-ugly
-install_pkg volumeicon
-install_pkg playerctl
-install_pkg pulseaudio-bluetooth
-install_pkg bluez
-install_pkg bluez-libs
-install_pkg bluez-utils
-install_pkg blueberry
-install_pkg cups
-install_pkg cups-pdf
-install_pkg ghostscript
-install_pkg gsfonts
-install_pkg gutenprint
-install_pkg gtk3-print-backends
-install_pkg libcups
-install_pkg hplip
-install_pkg system-config-printer
-install_pkg samba
-install_pkg gvfs-smb
-install_pkg avahi
-install_pkg nss-mdns
-install_pkg gvfs-smb
-install_pkg tlp
-
-install_pkg catfish
-install_pkg cronie
-install_pkg galculator
-install_pkg gnome-screenshot
-install_pkg plank
-install_pkg xfburn
-install_pkg variety
-install_pkg geany
-install_pkg vim
-install_pkg nano
-
-install_pkg gimp
-install_pkg gnome-font-viewer
-install_pkg gpick
-install_pkg inkscape
-
-install_pkg chromium
-install_pkg firefox
-install_pkg thunderbird
-
-install_pkg deadbeef
-install_pkg mpv
-install_pkg pragha
-install_pkg simplescreenrecorder
-install_pkg smplayer
-install_pkg vlc
-
-install_pkg libreoffice-fresh
-
-install_pkg arc-gtk-theme
-install_pkg accountsservice
-install_pkg baobab
-install_pkg curl
-install_pkg dconf-editor
-install_pkg dmidecode
-install_pkg ffmpegthumbnailer
-install_pkg git
-install_pkg glances
-install_pkg gnome-disk-utility
-install_pkg gnome-keyring
-install_pkg gparted
-install_pkg grsync
-install_pkg gtk-engine-murrine
-install_pkg gvfs
-install_pkg gvfs-mtp
-install_pkg hardinfo
-install_pkg hddtemp
-install_pkg htop
-install_pkg kvantum-qt5
-install_pkg kvantum-theme-arc
-install_pkg lm_sensors
-install_pkg lsb-release
-install_pkg mlocate
-install_pkg net-tools
-install_pkg notify-osd
-install_pkg noto-fonts
-install_pkg numlockx
-install_pkg polkit-gnome
-install_pkg qt5ct
-install_pkg sane
-install_pkg screenfetch
-install_pkg scrot
-install_pkg simple-scan
-install_pkg sysstat
-install_pkg termite
-install_pkg thunar
-install_pkg thunar-archive-plugin
-install_pkg thunar-volman
-install_pkg ttf-ubuntu-font-family
-install_pkg ttf-droid
-install_pkg tumbler
-install_pkg vnstat
-install_pkg wget
-install_pkg wmctrl
-install_pkg unclutter
-install_pkg rxvt-unicode
-install_pkg urxvt-perls
-install_pkg xdg-user-dirs
-install_pkg xdo
-install_pkg xdotool
-install_pkg zenity
-install_pkg unace
-install_pkg unrar
-install_pkg zip
-install_pkg unzip
-install_pkg sharutils
-install_pkg uudeview
-install_pkg arj
-install_pkg cabextract
-install_pkg file-roller
-
-install_pkg arcolinux-arc-themes-nico-git
-install_pkg arcolinux-bin-git
-install_pkg arcolinux-conky-collection-git
-install_pkg arcolinux-cron-git
-install_pkg arcolinux-faces-git
-install_pkg arcolinux-fonts-git
-install_pkg arcolinux-geany-git
-install_pkg arcolinux-hblock-git
-install_pkg arcolinux-kvantum-git
-install_pkg arcolinux-lightdm-gtk-greeter
-install_pkg arcolinux-lightdm-gtk-greeter-settings
-install_pkg arcolinux-local-applications-git
-install_pkg arcolinux-local-xfce4-git
-install_pkg arcolinux-mirrorlist-git
-install_pkg arcolinux-neofetch-git
-install_pkg arcolinux-nitrogen-git
-install_pkg arcolinux-pipemenus-git
-install_pkg arcolinux-plank-git
-install_pkg arcolinux-plank-themes-git
-install_pkg arcolinux-qt5-git
-install_pkg arcolinux-rofi-git
-install_pkg arcolinux-rofi-themes-git
-install_pkg arcolinux-root-git
-install_pkg arcolinux-slim
-install_pkg arcolinux-slimlock-themes-git
-install_pkg arcolinux-system-config-git
-install_pkg arcolinux-termite-themes-git
-install_pkg arcolinux-variety-git
-install_pkg arcolinux-wallpapers-git
-
-install_pkg adobe-source-sans-pro-fonts
-install_pkg cantarell-fonts
-install_pkg noto-fonts
-install_pkg ttf-bitstream-vera
-install_pkg ttf-dejavu
-install_pkg ttf-droid
-install_pkg ttf-hack
-install_pkg ttf-inconsolata
-install_pkg ttf-liberation
-install_pkg ttf-roboto
-install_pkg ttf-ubuntu-font-family
-install_pkg tamsyn-font
-install_pkg intel-ucode
 
 install_aur ttf-font-awesome
 install_aur brackets-bin
@@ -321,4 +143,3 @@ printf_head "Finished " ; echo""
 set -- 
 
 # end
-# vim: set expandtab ts=2 noai
