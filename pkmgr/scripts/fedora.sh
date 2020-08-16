@@ -33,16 +33,16 @@ fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 run_post() { local e="$1" ; local m="$(echo $1 | sed 's#devnull ##g')" ; execute "$e" "executing: $m" ; setexitstatus ; set -- ;}
-system_service_exists() { if systemctl list-units --full -all | grep -Fq "$1" ; then return 0 ; else return 1 ; fi ; setexitstatus ; set -- ;}
-system_service_enable() { if system_service_exists ; then execute "systemctl enable -f $1" "Enabling service: $1" ; fi ; setexitstatus ; set -- ;}
-system_service_disable() { if system_service_exists ; then execute "systemctl disable --now $@" "Disabling service: $@" ; fi ; setexitstatus ; set --;}
+system_service_exists() { if sudo systemctl list-units --full -all | grep -Fq "$1" ; then return 0 ; else return 1 ; fi ; setexitstatus ; set -- ;}
+system_service_enable() { if system_service_exists ; then execute "sudo systemctl enable -f $1" "Enabling service: $1" ; fi ; setexitstatus ; set -- ;}
+system_service_disable() { if system_service_exists ; then execute "sudo systemctl disable --now $@" "Disabling service: $@" ; fi ; setexitstatus ; set --;}
 
-test_pkg() { devnull rpm -q $pkg $1 && printf_success "$1 is installed" && return 1 || return 0 ; setexitstatus ; set -- ;}
-remove_pkg() { if ! test_pkg "$1" ; then execute "yum remove -q -y $1" "Removing: $1" ; fi ; setexitstatus ; set -- ;}
-install_pkg() { if test_pkg "$1" ; then execute "yum remove -q -y install $1" "Installing: $1" ; fi ; setexitstatus ; set --  ;}
+test_pkg() { devnull sudo rpm -q $pkg $1 && printf_success "$1 is installed" && return 1 || return 0 ; setexitstatus ; set -- ;}
+remove_pkg() { if ! test_pkg "$1" ; then execute "sudo dnf remove -q -y $1" "Removing: $1" ; fi ; setexitstatus ; set -- ;}
+install_pkg() { if test_pkg "$1" ; then execute "sudo install -q -y install $1" "Installing: $1" ; fi ; setexitstatus ; set --  ;}
 
-detect_selinux() { selinuxenabled; if [ $? -ne 0 ]; then return 0; else return 1 ; fi ;}
-disable_selinux() { selinuxenabled; setenforce 0 ;}
+detect_selinux() { sudo selinuxenabled; if [ $? -ne 0 ]; then return 0; else return 1 ; fi ;}
+disable_selinux() { sudo selinuxenabled; setenforce 0 ;}
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -54,6 +54,7 @@ disable_selinux() { selinuxenabled; setenforce 0 ;}
 printf_head "Initializing the setup script"
 ##################################################################################################################
 
+sudoask && sudoexit
 execute "sudo PKMGR"
 
 ##################################################################################################################
@@ -104,7 +105,7 @@ system_service_enable tlp.service
 system_service_enable org.cups.cupsd.service
 system_service_disable mpd
 
-run_post "devnull systemctl set-default multi-user.target"
+run_post "devnull systemctl set-default graphical.target"
 
 run_post "devnull grub-mkconfig -o /boot/grub/grub.cfg"
 
