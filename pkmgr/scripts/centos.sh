@@ -39,7 +39,7 @@ system_service_exists() { if systemctl list-units --full -all | grep -Fq "$1" ; 
 system_service_enable() { if system_service_exists ; then execute "systemctl enable -f $1" "Enabling service: $1" ; fi ; setexitstatus ; set -- ;}
 system_service_disable() { if system_service_exists ; then execute "systemctl disable --now $@" "Disabling service: $@" ; fi ; setexitstatus ; set --;}
 
-test_pkg() { devnull rpm -q $pkg $1 && printf_success "$1 is installed" && return 1 || return 0 ; setexitstatus ; set -- ;}
+test_pkg() { devnull rpm -q $1 && printf_success "$1 is installed" && return 1 || return 0 ; setexitstatus ; set -- ;}
 remove_pkg() { if ! test_pkg "$1" ; then execute "yum remove -q -y $1" "Removing: $1" ; fi ; setexitstatus ; set -- ;}
 install_pkg() { if test_pkg "$1" ; then execute "yum remove -q -y install $1" "Installing: $1" ; fi ; setexitstatus ; set --  ;}
 
