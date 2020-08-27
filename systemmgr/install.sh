@@ -35,7 +35,7 @@ fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-grub() { cmd_exists grub2 && APPINSTNAME=grub2 || cmd_exists grub && APPINSTNAME=grub ;}
+#NAME() { cmd_exists NAME && APPINSTNAME=NAME || cmd_exists NAME2 && APPINSTNAME=NAME2 ;}
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -48,13 +48,6 @@ scripts_check
 # Defaults
 
 APPNAME="NAME"
-PLUGNAME=""
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# git repos
-
-PLUGINREPO=""
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -148,22 +141,6 @@ else
     "backupapp && \
          git_clone -q $REPO/$APPNAME $APPDIR" \
     "Installing $APPNAME configurations"
-fi
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# Plugins
-
-if [ "$PLUGNAME" != "" ]; then
-  if [ -d "$PLUGDIR"/.git ]; then
-    execute \
-      "git_update $PLUGDIR" \
-      "Updating $PLUGNAME"
-  else
-    execute \
-      "git_clone $PLUGINREPO $PLUGDIR" \
-      "Installing $PLUGNAME"
-  fi
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
