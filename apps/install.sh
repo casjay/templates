@@ -8,7 +8,7 @@ HOME="${USER_HOME:-${HOME}}"
 # @Author          : Jason
 # @Contact         : casjaysdev@casjay.net
 # @File            : install.sh
-# @Created         : Wed, Aug 15, 2020, 13:52 EST
+# @Created         : Thurs, Aug 27, 2020, 17:00 EST
 # @License         : WTFPL
 # @Copyright       : Copyright (c) CasjaysDev
 # @Description     : installer script for template
@@ -59,7 +59,7 @@ APPVERSION="$(curl -LSs ${DOTFILESREPO:-https://github.com/casjay-dotfiles}/$APP
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# options are: user_installdirs system_installdirs pkmgr_installer iconmgr_installer font_installer theme_installer
+# options are: user_installdirs system_installdirs pkmgr_installer iconmgr_installer font_installer systemmgr_installer theme_installer wallpapermgr_installer
 
 user_installdirs
 
@@ -75,6 +75,12 @@ PLUGDIR="$SHARE/$APPNAME/${PLUGNAME:-plugins}"
 # Script options IE: --help
 
 show_optvars "$@"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Do not update
+
+#systemmgr_noupdate
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
