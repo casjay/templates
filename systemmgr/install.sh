@@ -51,12 +51,6 @@ APPNAME="NAME"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# if installing system wide - change to system_installdirs
-
-systemmgr_installer
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 # Version
 
 APPVERSION="$(curl -LSs ${SYSTEMMGRREPO:-https://github.com/systemmgr}/$APPNAME/raw/master/version.txt)"
@@ -66,6 +60,12 @@ APPVERSION="$(curl -LSs ${SYSTEMMGRREPO:-https://github.com/systemmgr}/$APPNAME/
 # Set options
 
 APPDIR="$HOMEDIR/$APPNAME"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# if installing system wide - change to system_installdirs
+
+systemmgr_installer
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
