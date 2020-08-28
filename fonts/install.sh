@@ -44,13 +44,6 @@ fi
 # Defaults
 
 APPNAME="template"
-PLUGNAME=""
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# git repos
-
-PLUGINREPO=""
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -60,7 +53,7 @@ APPVERSION="$(curl -LSs ${FONTMGRREPO:-https://github.com/fontmgr}/$APPNAME/raw/
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# options are: user_installdirs system_installdirs pkmgr_installer iconmgr_installer font_installer theme_installer
+# user_installdirs system_installdirs font_installer iconmgr_installer pkmgr_installer systemmgr_installer theme_installer wallpaper_installer
 
 font_installer
 
@@ -69,7 +62,6 @@ font_installer
 # Set options
 
 APPDIR="$SHARE/CasjaysDev/fontmgr/$APPNAME"
-PLUGDIR="$SHARE/$APPNAME/${PLUGNAME:-plugins}"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -153,25 +145,6 @@ failexitcode
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Plugins
-
-if [ "$PLUGNAME" != "" ]; then
-  if [ -d "$PLUGDIR"/.git ]; then
-    execute \
-      "git_update $PLUGDIR" \
-      "Updating $PLUGNAME"
-  else
-    execute \
-      "git_clone $PLUGINREPO $PLUGDIR" \
-      "Installing $PLUGNAME"
-  fi
-fi
-
-# exit on fail
-failexitcode
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 # run post install scripts
 
 run_postinst() {
@@ -187,7 +160,7 @@ execute \
 
 # create version file
 
-install_fontmgr_version
+fontmgr_install_version
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
