@@ -65,7 +65,7 @@ font_installer
 
 # Set options
 
-APPDIR="$CONF/$APPNAME"
+APPDIR="${APPDIR:-$CASJAYSDEVSHARE/fontmgr/$APPNAME}"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
