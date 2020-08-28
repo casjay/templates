@@ -66,7 +66,7 @@ dfmgr_install
 
 # Set options
 
-APPDIR="$CONF/$APPNAME"
+APPDIR="${APPDIR:-$CONF/$APPNAME}"
 PLUGDIR="$SHARE/$APPNAME"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
