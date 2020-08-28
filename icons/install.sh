@@ -5,13 +5,13 @@ USER="${SUDO_USER:-${USER}}"
 HOME="${USER_HOME:-${HOME}}"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# @Author      : Jason
-# @Contact     : casjaysdev@casjay.net
-# @File        : install
-# @Created     : Mon, Dec 31, 2019, 00:00 EST
-# @License     : WTFPL
-# @Copyright   : Copyright (c) CasjaysDev
-# @Description : installer script for template
+# @Author          : Jason
+# @Contact         : casjaysdev@casjay.net
+# @File            : install.sh
+# @Created         : Fr, Aug 28, 2020, 00:00 EST
+# @License         : WTFPL
+# @Copyright       : Copyright (c) CasjaysDev
+# @Description     : installer script for template icons
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -24,14 +24,18 @@ SCRIPTSFUNCTFILE="${SCRIPTSAPPFUNCTFILE:-app-installer.bash}"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 if [ -f "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE" ]; then
-  . "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE"
+    . "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE"
 elif [ -f "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE" ]; then
-  . "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE"
+    . "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE"
 else
-  mkdir -p "/tmp/CasjaysDev/functions"
-  curl -LSs "$SCRIPTSFUNCTURL/$SCRIPTSFUNCTFILE" -o "/tmp/CasjaysDev/functions/$SCRIPTSFUNCTFILE" || exit 1
-  . "/tmp/CasjaysDev/functions/$SCRIPTSFUNCTFILE"
+    curl -LSs "$SCRIPTSFUNCTURL/$SCRIPTSFUNCTFILE" -o "/tmp/$SCRIPTSFUNCTFILE" || exit 1
+    . "/tmp/$SCRIPTSFUNCTFILE"
 fi
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Install Type: user_installdirs system_installdirs
+
+system_installdirs
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -44,23 +48,16 @@ scripts_check
 # Defaults
 
 APPNAME="template"
-PLUGNAME=""
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# git repos
-
-PLUGINREPO=""
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Version
 
-APPVERSION="$(curl -LSs ${ICONMGRREPO:-https://github.com/iconmgr}/$APPNAME/raw/master/version.txt)"
+APPVERSION="$(curl -LSs ${DOTFILESREPO:-https://github.com/casjay-dotfiles}/$APPNAME/raw/master/version.txt)"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# options are: user_installdirs system_installdirs pkmgr_installer iconmgr_installer font_installer theme_installer
+# dfmgr_installer iconmgr_installer font_installer pkmgr_installer systemmgr_installer theme_installer wallpapermgr_installer
 
 iconmgr_installer
 
@@ -68,14 +65,19 @@ iconmgr_installer
 
 # Set options
 
-APPDIR="$SHARE/CasjaysDev/iconmgr/$APPNAME"
-PLUGDIR="$SHARE/$APPNAME/${PLUGNAME:-plugins}"
+APPDIR="$CONF/$APPNAME"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Script options IE: --help
 
 show_optvars "$@"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Do not update
+
+#systemmgr_noupdate
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -88,7 +90,7 @@ show_optvars "$@"
 
 # end with a space
 
-APP=""
+APP="$APPNAME "
 PERL=""
 PYTH=""
 PIPS=""
@@ -132,33 +134,14 @@ ensure_perms
 # Main progam
 
 if [ -d "$APPDIR/.git" ]; then
-  execute \
-    "git_update $APPDIR" \
-    "Updating $APPNAME icons"
+    execute \
+        "git_update $APPDIR" \
+        "Updating $APPNAME configurations"
 else
-  execute \
-    "backupapp && \
-    git_clone -q $REPO/$APPNAME $APPDIR" \
-    "Installing $APPNAME icons"
-fi
-
-# exit on fail
-failexitcode
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# Plugins
-
-if [ "$PLUGNAME" != "" ]; then
-  if [ -d "$PLUGDIR"/.git ]; then
     execute \
-      "git_update $PLUGDIR" \
-      "Updating $PLUGNAME"
-  else
-    execute \
-      "git_clone $PLUGINREPO $PLUGDIR" \
-      "Installing $PLUGNAME"
-  fi
+        "backupapp && \
+         git_clone -q $REPO/$APPNAME $APPDIR" \
+        "Installing $APPNAME configurations"
 fi
 
 # exit on fail
@@ -169,19 +152,19 @@ failexitcode
 # run post install scripts
 
 run_postinst() {
-  run_postinst_global
-  run_post_icons
+    run_postinst_global
+    iconmgr_run_post
 }
 
 execute \
-  "run_postinst" \
-  "Running post install scripts"
+    "run_postinst" \
+    "Running post install scripts"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # create version file
 
-install_iconmgr_version
+iconmgr_install_version
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
