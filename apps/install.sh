@@ -8,7 +8,7 @@ HOME="${USER_HOME:-${HOME}}"
 # @Author          : Jason
 # @Contact         : casjaysdev@casjay.net
 # @File            : install.sh
-# @Created         : Thurs, Aug 27, 2020, 17:00 EST
+# @Created         : Fr, Aug 28, 2020, 00:00 EST
 # @License         : WTFPL
 # @Copyright       : Copyright (c) CasjaysDev
 # @Description     : installer script for template
@@ -33,6 +33,11 @@ else
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Install Type: user_installdirs system_installdirs
+
+user_installdirs
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Make sure the scripts repo is installed
 
@@ -43,13 +48,7 @@ scripts_check
 # Defaults
 
 APPNAME="template"
-PLUGNAME=""
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# git repos
-
-PLUGINREPO=""
+PLUGNAMES=""
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -59,16 +58,16 @@ APPVERSION="$(curl -LSs ${DOTFILESREPO:-https://github.com/casjay-dotfiles}/$APP
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# options are: user_installdirs system_installdirs pkmgr_installer iconmgr_installer font_installer systemmgr_installer theme_installer wallpapermgr_installer
+# dfmgr_install fontmgr_install iconmgr_install pkmgr_install systemmgr_install thememgr_install wallpapermgr_install
 
-user_installdirs
+dfmgr_install
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Set options
 
 APPDIR="$CONF/$APPNAME"
-PLUGDIR="$SHARE/$APPNAME/${PLUGNAME:-plugins}"
+PLUGDIR="$SHARE/$APPNAME"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -154,15 +153,15 @@ failexitcode
 
 # Plugins
 
-if [ "$PLUGNAME" != "" ]; then
-    if [ -d "$PLUGDIR"/.git ]; then
+if [ "$PLUGNAMES" != "" ]; then
+    if [ -d "$PLUGDIR"/PLUGNAME/.git ]; then
         execute \
             "git_update $PLUGDIR" \
-            "Updating plugin $PLUGNAME"
+            "Updating plugin PLUGNAME"
     else
         execute \
-            "git_clone $PLUGINREPO $PLUGDIR" \
-            "Installing plugin $PLUGNAME"
+            "git_clone PLUGINREPO $PLUGDIR/PLUGNAME" \
+            "Installing plugin PLUGNAME"
     fi
 fi
 
@@ -175,7 +174,7 @@ failexitcode
 
 run_postinst() {
     run_postinst_global
-    
+    dfmgr_run_post
 }
 
 execute \
@@ -186,7 +185,7 @@ execute \
 
 # create version file
 
-install_version
+dfmgr_install_version
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
