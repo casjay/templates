@@ -8,7 +8,7 @@ HOME="${USER_HOME:-${HOME}}"
 # @Author          : Jason
 # @Contact         : casjaysdev@casjay.net
 # @File            : install.sh
-# @Created         : Wed, Aug 09, 2020, 02:00 EST
+# @Created         : Fr, Aug 28, 2020, 00:00 EST
 # @License         : WTFPL
 # @Copyright       : Copyright (c) CasjaysDev
 # @Description     : installer script for template
@@ -24,13 +24,18 @@ SCRIPTSFUNCTFILE="${SCRIPTSAPPFUNCTFILE:-app-installer.bash}"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 if [ -f "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE" ]; then
-  . "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE"
+    . "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE"
 elif [ -f "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE" ]; then
-  . "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE"
+    . "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE"
 else
-  curl -LSs "$SCRIPTSFUNCTURL/$SCRIPTSFUNCTFILE" -o "/tmp/$SCRIPTSFUNCTFILE" || exit 1
-  . "/tmp/$SCRIPTSFUNCTFILE"
+    curl -LSs "$SCRIPTSFUNCTURL/$SCRIPTSFUNCTFILE" -o "/tmp/$SCRIPTSFUNCTFILE" || exit 1
+    . "/tmp/$SCRIPTSFUNCTFILE"
 fi
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Install Type: user_installdirs system_installdirs
+
+user_installdirs
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -43,38 +48,36 @@ scripts_check
 # Defaults
 
 APPNAME="template"
-PLUGNAME=""
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# git repos
-
-PLUGINREPO=""
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Version
 
-APPVERSION="$(curl -LSs ${THEMEMGRREPO:-https://github.com/thememgr}/$APPNAME/raw/master/version.txt)"
+APPVERSION="$(curl -LSs ${DOTFILESREPO:-https://github.com/casjay-dotfiles}/$APPNAME/raw/master/version.txt)"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# installer type
+# dfmgr_install fontmgr_install iconmgr_install pkmgr_install systemmgr_install thememgr_install wallpapermgr_install
 
-theme_installer
+thememgr_install
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Set options
 
-APPDIR="$CONF/CasjaysDev/thememgr"
-PLUGDIR="$SHARE/$APPNAME/${PLUGNAME:-plugins}"
+APPDIR="${APPDIR:-$CASJAYSDEVSHARE/thememgr/$APPNAME}"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Script options IE: --help
 
 show_optvars "$@"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Do not update
+
+#systemmgr_noupdate
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -87,7 +90,7 @@ show_optvars "$@"
 
 # end with a space
 
-APP=""
+APP="$APPNAME "
 PERL=""
 PYTH=""
 PIPS=""
@@ -116,7 +119,7 @@ install_cpan $CPAN
 install_gem $GEMS
 
 # Other dependencies
-dotfilesreq
+dotfilesreq 
 dotfilesreqadmin
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -131,14 +134,14 @@ ensure_perms
 # Main progam
 
 if [ -d "$APPDIR/.git" ]; then
-  execute \
-    "git_update $APPDIR" \
-    "Updating $APPNAME configurations"
+    execute \
+        "git_update $APPDIR" \
+        "Updating $APPNAME configurations"
 else
-  execute \
-    "backupapp && \
-    git_clone -q $REPO/$APPNAME $APPDIR" \
-    "Installing $APPNAME configurations"
+    execute \
+        "backupapp && \
+         git_clone -q $REPO/$APPNAME $APPDIR" \
+        "Installing $APPNAME configurations"
 fi
 
 # exit on fail
@@ -149,15 +152,15 @@ failexitcode
 # Plugins
 
 if [ "$PLUGNAME" != "" ]; then
-  if [ -d "$PLUGDIR"/.git ]; then
-    execute \
-      "git_update $PLUGDIR" \
-      "Updating $PLUGNAME"
-  else
-    execute \
-      "git_clone $PLUGINREPO $PLUGDIR" \
-      "Installing $PLUGNAME"
-  fi
+    if [ -d "$PLUGDIR"/.git ]; then
+        execute \
+            "git_update $PLUGDIR" \
+            "Updating plugin $PLUGNAME"
+    else
+        execute \
+            "git_clone $PLUGINREPO $PLUGDIR" \
+            "Installing plugin $PLUGNAME"
+    fi
 fi
 
 # exit on fail
@@ -168,19 +171,19 @@ failexitcode
 # run post install scripts
 
 run_postinst() {
-  run_postinst_global
-  run_post_theme
+    run_postinst_global
+    thememgr_run_post
 }
 
 execute \
-  "run_postinst" \
-  "Running post install scripts"
+    "run_postinst" \
+    "Running post install scripts"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # create version file
 
-install_thememgr_version
+thememgr_install_version
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
