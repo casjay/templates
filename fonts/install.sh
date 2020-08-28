@@ -57,9 +57,9 @@ APPVERSION="$(curl -LSs ${DOTFILESREPO:-https://github.com/casjay-dotfiles}/$APP
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# dfmgr_installer iconmgr_installer font_installer pkmgr_installer systemmgr_installer theme_installer wallpapermgr_installer
+# dfmgr_install fontmgr_install iconmgr_install pkmgr_install systemmgr_install thememgr_install wallpapermgr_install
 
-font_installer
+fontmgr_installer
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
