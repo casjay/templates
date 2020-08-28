@@ -65,7 +65,7 @@ iconmgr_installer
 
 # Set options
 
-APPDIR="$CONF/$APPNAME"
+APPDIR="${APPDIR:-$CASJAYSDEVSHARE/iconmgr/$APPNAME}"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
