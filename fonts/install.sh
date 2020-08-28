@@ -8,7 +8,7 @@ HOME="${USER_HOME:-${HOME}}"
 # @Author          : Jason
 # @Contact         : casjaysdev@casjay.net
 # @File            : install.sh
-# @Created         : Thurs, Aug 27, 2020, 17:00 EST
+# @Created         : Fr, Aug 28, 2020, 00:00 EST
 # @License         : WTFPL
 # @Copyright       : Copyright (c) CasjaysDev
 # @Description     : installer script for template font
@@ -24,20 +24,24 @@ SCRIPTSFUNCTFILE="${SCRIPTSAPPFUNCTFILE:-app-installer.bash}"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 if [ -f "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE" ]; then
-  . "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE"
+    . "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE"
 elif [ -f "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE" ]; then
-  . "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE"
+    . "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE"
 else
-  mkdir -p "/tmp/CasjaysDev/functions"
-  curl -LSs "$SCRIPTSFUNCTURL/$SCRIPTSFUNCTFILE" -o "/tmp/CasjaysDev/functions/$SCRIPTSFUNCTFILE" || exit 1
-  . "/tmp/CasjaysDev/functions/$SCRIPTSFUNCTFILE"
+    curl -LSs "$SCRIPTSFUNCTURL/$SCRIPTSFUNCTFILE" -o "/tmp/$SCRIPTSFUNCTFILE" || exit 1
+    . "/tmp/$SCRIPTSFUNCTFILE"
 fi
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Install Type: user_installdirs system_installdirs
+
+system_installdirs
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Make sure the scripts repo is installed
 
-#scripts_check
+scripts_check
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -49,11 +53,11 @@ APPNAME="template"
 
 # Version
 
-APPVERSION="$(curl -LSs ${FONTMGRREPO:-https://github.com/fontmgr}/$APPNAME/raw/master/version.txt)"
+APPVERSION="$(curl -LSs ${DOTFILESREPO:-https://github.com/casjay-dotfiles}/$APPNAME/raw/master/version.txt)"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# user_installdirs system_installdirs font_installer iconmgr_installer pkmgr_installer systemmgr_installer theme_installer wallpaper_installer
+# dfmgr_installer iconmgr_installer font_installer pkmgr_installer systemmgr_installer theme_installer wallpapermgr_installer
 
 font_installer
 
@@ -61,7 +65,7 @@ font_installer
 
 # Set options
 
-APPDIR="$SHARE/CasjaysDev/fontmgr/$APPNAME"
+APPDIR="$CONF/$APPNAME"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -73,7 +77,7 @@ show_optvars "$@"
 
 # Do not update
 
-#installer_noupdate
+#systemmgr_noupdate
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -86,7 +90,7 @@ show_optvars "$@"
 
 # end with a space
 
-APP=""
+APP="$APPNAME "
 PERL=""
 PYTH=""
 PIPS=""
@@ -115,7 +119,7 @@ install_cpan $CPAN
 install_gem $GEMS
 
 # Other dependencies
-dotfilesreq
+dotfilesreq git
 dotfilesreqadmin
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -130,14 +134,14 @@ ensure_perms
 # Main progam
 
 if [ -d "$APPDIR/.git" ]; then
-  execute \
-    "git_update $APPDIR" \
-    "Updating $APPNAME fonts"
+    execute \
+        "git_update $APPDIR" \
+        "Updating $APPNAME configurations"
 else
-  execute \
-    "backupapp && \
-    git_clone -q $REPO/$APPNAME $APPDIR" \
-    "Installing $APPNAME fonts"
+    execute \
+        "backupapp && \
+         git_clone -q $REPO/$APPNAME $APPDIR" \
+        "Installing $APPNAME configurations"
 fi
 
 # exit on fail
@@ -148,13 +152,13 @@ failexitcode
 # run post install scripts
 
 run_postinst() {
-  run_postinst_global
-
+    run_postinst_global
+    fontmgr_run_post
 }
 
 execute \
-  "run_postinst" \
-  "Running post install scripts"
+    "run_postinst" \
+    "Running post install scripts"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
