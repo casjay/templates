@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-APPNAME="$(basename $0)"
+APPNAME="TEMPLATE"
 USER="${SUDO_USER:-${USER}}"
 HOME="${USER_HOME:-${HOME}}"
 
@@ -11,7 +11,7 @@ HOME="${USER_HOME:-${HOME}}"
 # @Created         : Fr, Aug 28, 2020, 00:00 EST
 # @License         : WTFPL
 # @Copyright       : Copyright (c) CasjaysDev
-# @Description     : installer script for template
+# @Description     : installer script for TEMPLATE
 #
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -24,18 +24,20 @@ SCRIPTSFUNCTFILE="${SCRIPTSAPPFUNCTFILE:-app-installer.bash}"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 if [ -f "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE" ]; then
-    . "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE"
+  . "$SCRIPTSFUNCTDIR/functions/$SCRIPTSFUNCTFILE"
 elif [ -f "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE" ]; then
-    . "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE"
+  . "$HOME/.local/share/CasjaysDev/functions/$SCRIPTSFUNCTFILE"
 else
-    curl -LSs "$SCRIPTSFUNCTURL/$SCRIPTSFUNCTFILE" -o "/tmp/$SCRIPTSFUNCTFILE" || exit 1
-    . "/tmp/$SCRIPTSFUNCTFILE"
+  curl -LSs "$SCRIPTSFUNCTURL/$SCRIPTSFUNCTFILE" -o "/tmp/$SCRIPTSFUNCTFILE" || exit 1
+  . "/tmp/$SCRIPTSFUNCTFILE"
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Install Type: user_installdirs system_installdirs
-
 user_installdirs
+
+# OS Support: supported_os unsupported_oses
+
+unsupported_oses
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -46,15 +48,18 @@ scripts_check
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Defaults
-
-APPNAME="template"
-PLUGNAMES=""
+APPNAME="${APPNAME:-TEMPLATE}"
+APPDIR="${APPDIR:-$HOME/.config/$APPNAME}"
+REPO="${DFMGRREPO:-https://github.com/dfmgr}/${APPNAME}"
+REPORAW="${REPORAW:-$REPO/raw}"
+APPVERSION="$(__appversion)"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Version
+# Setup plugins
 
-APPVERSION="$(curl -LSs ${DOTFILESREPO:-https://github.com/casjay-dotfiles}/$APPNAME/raw/master/version.txt)"
+PLUGNAMES=""
+PLUGDIR="${SHARE:-$HOME/.local/share}/$APPNAME"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -64,10 +69,7 @@ dfmgr_install
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Set options
-
-APPDIR="${APPDIR:-$CONF/$APPNAME}"
-PLUGDIR="$SHARE/$APPNAME"
+# Version
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -135,15 +137,18 @@ ensure_perms
 
 # Main progam
 
-if [ -d "$APPDIR/.git" ]; then
-    execute \
-        "git_update $APPDIR" \
-        "Updating $APPNAME configurations"
+if [ -d "$APPDIR" ]; then
+  execute "backupapp $APPDIR $APPNAME" "Backing up $APPDIR"
+fi
+
+if [ -d "$DOWNLOADED_TO/.git" ]; then
+  execute \
+    "git_update $DOWNLOADED_TO" \
+    "Updating $APPNAME configurations"
 else
-    execute \
-        "backupapp && \
-         git_clone -q $REPO/$APPNAME $APPDIR" \
-        "Installing $APPNAME configurations"
+  execute \
+    "git_clone $REPO/$APPNAME $DOWNLOADED_TO" \
+    "Installing $APPNAME configurations"
 fi
 
 # exit on fail
@@ -153,33 +158,34 @@ failexitcode
 
 # Plugins
 
-if [ "$PLUGNAMES" != "" ]; then
+if __am_i_online; then
+  if [ "$PLUGNAMES" != "" ]; then
     if [ -d "$PLUGDIR"/PLUGNAME/.git ]; then
-        execute \
-            "git_update $PLUGDIR" \
-            "Updating plugin PLUGNAME"
+      execute \
+        "git_update $PLUGDIR" \
+        "Updating plugin PLUGNAME"
     else
-        execute \
-            "git_clone PLUGINREPO $PLUGDIR/PLUGNAME" \
-            "Installing plugin PLUGNAME"
+      execute \
+        "git_clone PLUGINREPO $PLUGDIR/PLUGNAME" \
+        "Installing plugin PLUGNAME"
     fi
-fi
+  fi
 
-# exit on fail
-failexitcode
+  # exit on fail
+  failexitcode
+fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # run post install scripts
 
 run_postinst() {
-    run_postinst_global
-    dfmgr_run_post
+  dfmgr_run_post
 }
 
 execute \
-    "run_postinst" \
-    "Running post install scripts"
+  "run_postinst" \
+  "Running post install scripts"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
